@@ -1,10 +1,14 @@
 using Microsoft.AspNetCore.Authorization;
+using WT.WebApplication.Infrastructure.Authentication;
 using WT.WebApplication.Infrastructure.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddSingleton<IAuthToken, AuthToken>();
 
 builder.Services.AddAuthentication("cookies")
     .AddCookie("cookies", o =>
@@ -28,6 +32,18 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddSingleton<IAuthorizationHandler, HRManagerProbationRequirementHandler>();
 
+builder.Services.AddHttpClient("MainWebAPI", client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7130/");
+});
+
+builder.Services.AddSession(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.IdleTimeout = TimeSpan.FromMinutes(20);
+    options.Cookie.IsEssential = true;
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -45,6 +61,8 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseSession();
 
 app.MapRazorPages();
 
