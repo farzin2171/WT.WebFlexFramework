@@ -1,24 +1,63 @@
 using Microsoft.AspNetCore.Authorization;
+using WT.WebApplication.Data;
 using WT.WebApplication.Infrastructure.Authentication;
 using WT.WebApplication.Infrastructure.Authorization;
+using Microsoft.EntityFrameworkCore;
+using WT.WebApplication.Infrastructure.Extentions;
+using WT.WebApplication.Data.Account;
+using Microsoft.AspNetCore.Identity;
+using WT.WebApplication.Settings;
+using WT.WebApplication.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("Default"))
+    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+});
+
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddSingleton<IAuthToken, AuthToken>();
 
-builder.Services.AddAuthentication("cookies")
-    .AddCookie("cookies", o =>
-    {
-        o.Cookie.Name = "WT.WebApplication";
-        o.ExpireTimeSpan = TimeSpan.FromHours(8);
+builder.Services.Configure<SmtpSetting>(builder.Configuration.GetSection("SMTP"));
+builder.Services.AddSingleton<IEmailService, EmailService>();
 
-        o.LoginPath = "/account/login";
-        o.AccessDeniedPath = "/account/login";
-    });
+builder.Services.AddIdentity<User, IdentityRole>(options =>
+{
+    options.Password.RequiredLength = 8;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = true;
+
+    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+
+    options.User.RequireUniqueEmail = true;
+    options.SignIn.RequireConfirmedEmail = true;
+})
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultTokenProviders();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.Name = "WT.WebApplication";
+    options.ExpireTimeSpan = TimeSpan.FromHours(8);
+    options.LoginPath = "/Account/Login";
+    options.AccessDeniedPath = "/Account/AccessDenied";
+});
+
+//builder.Services.AddAuthentication("cookies")
+//    .AddCookie("cookies", o =>
+//    {
+//        o.Cookie.Name = "WT.WebApplication";
+//        o.ExpireTimeSpan = TimeSpan.FromHours(8);
+
+//        o.LoginPath = "/account/login";
+//        o.AccessDeniedPath = "/account/login";
+//    });
 
 builder.Services.AddAuthorization(options =>
 {
@@ -66,4 +105,5 @@ app.UseSession();
 
 app.MapRazorPages();
 
+app.RunDatabaseMigrations<ApplicationDbContext>();
 app.Run();
