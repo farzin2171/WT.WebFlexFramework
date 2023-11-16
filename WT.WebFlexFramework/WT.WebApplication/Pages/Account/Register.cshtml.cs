@@ -58,7 +58,7 @@ namespace WT.WebApplication.Pages.Account
                 var confirmationLink = Url.PageLink(pageName: "/Account/ConfirmEmail",
                     values: new { userId = user.Id, token = confirmationToken }) ?? "";
 
-                await _emailService.SendAsync("frankliu.associates@gmail.com",
+                await _emailService.SendAsync("Admin@webtech.com",
                     user.Email,
                     "Please confirm your email",
                     $"Please click on this link to confirm your email address: {confirmationLink}");

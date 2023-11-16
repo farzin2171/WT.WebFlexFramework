@@ -12,7 +12,7 @@ namespace WT.WebApplication.Pages.Account
     public class LoginModel : PageModel
     {
         [BindProperty(SupportsGet = true)]
-        public string ReturnUrl { get; set; } = String.Empty;
+        public string ReturnUrl { get; set; }
 
         [BindProperty]
         public CredentialViewModel Credential { get; set; } = new CredentialViewModel();
@@ -22,6 +22,7 @@ namespace WT.WebApplication.Pages.Account
         public LoginModel(SignInManager<User> signInManager)
         {
             _signInManager = signInManager;
+            ReturnUrl = "/";
         }
 
 
@@ -41,16 +42,17 @@ namespace WT.WebApplication.Pages.Account
 
             if (result.Succeeded)
             {
-                return RedirectToPage("/Index");
+                return LocalRedirect(ReturnUrl);
             }
             else
             {
                 if (result.RequiresTwoFactor)
                 {
-                    return RedirectToPage("/Account/LoginTwoFactorWithAuthenticator",
+                    return RedirectToPage("/Account/LoginTwoFactor",
                         new
                         {
-                            this.Credential.RememberMe
+                            Email = Credential.Email,
+                            RememberMe = Credential.RememberMe
                         });
                 }
 
