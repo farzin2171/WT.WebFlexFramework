@@ -48,10 +48,9 @@ namespace WT.WebApplication.Pages.Account
             {
                 if (result.RequiresTwoFactor)
                 {
-                    return RedirectToPage("/Account/LoginTwoFactor",
+                    return RedirectToPage("/Account/LoginTwoFactorWithAuthenticator",
                         new
                         {
-                            Email = Credential.Email,
                             RememberMe = Credential.RememberMe
                         });
                 }
