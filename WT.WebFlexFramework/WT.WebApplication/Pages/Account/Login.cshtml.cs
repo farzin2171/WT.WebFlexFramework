@@ -17,6 +17,9 @@ namespace WT.WebApplication.Pages.Account
         [BindProperty]
         public CredentialViewModel Credential { get; set; } = new CredentialViewModel();
 
+        [BindProperty]
+        public IEnumerable<AuthenticationScheme> ExternalLoginProviders { get; set; }
+
         private readonly SignInManager<User> _signInManager;
 
         public LoginModel(SignInManager<User> signInManager)
@@ -26,8 +29,9 @@ namespace WT.WebApplication.Pages.Account
         }
 
 
-        public void OnGet()
+        public async Task OnGetAsync()
         {
+            this.ExternalLoginProviders = await _signInManager.GetExternalAuthenticationSchemesAsync();
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -66,6 +70,21 @@ namespace WT.WebApplication.Pages.Account
 
                 return Page();
             }
+        }
+
+        public IActionResult OnPostLoginExternally(string provider)
+        {
+            var props = new AuthenticationProperties
+            {
+                RedirectUri = Url.Action("ExternalLoginCallback", "Account"),
+                Items =
+                {
+                    { "uru", ReturnUrl },
+                    { "scheme", "Google" }
+                }
+            };
+
+            return Challenge(props,"Google");
         }
     }
 }
