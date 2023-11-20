@@ -14,6 +14,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 
+builder.Services.AddControllers();
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default"))
@@ -48,6 +50,15 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LoginPath = "/Account/Login";
     options.AccessDeniedPath = "/Account/AccessDenied";
 });
+
+builder.Services.AddAuthentication().AddCookie("temp")
+    .AddGoogle("Google",o =>
+   {
+       o.ClientId = "635672167628-qc09tqq0rhe4hlf431ivqp5g30ab1e4r.apps.googleusercontent.com";
+       o.ClientSecret = "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";
+       o.SignInScheme = "temp";
+
+   });
 
 //builder.Services.AddAuthentication("cookies")
 //    .AddCookie("cookies", o =>
@@ -104,6 +115,7 @@ app.UseAuthorization();
 app.UseSession();
 
 app.MapRazorPages();
+app.MapControllers();
 
 app.RunDatabaseMigrations<ApplicationDbContext>();
 app.Run();
