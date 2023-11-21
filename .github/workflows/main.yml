@@ -1,0 +1,35 @@
+name: publish 🚀
+
+on:
+  workflow_dispatch:
+  push:
+    branches : 
+    - master
+    
+env:
+  AZURE_WEBAPP_NAME : Async-API
+  AZUR_WEBAPP_PACKAGE_PATH: '/home/runner/work/WT.AsyncAPI/WT.AsyncAPI/WT.AsyncProductAPI/bin/Release/net6.0/publish/' 
+
+
+jobs:
+  publish : 
+    runs-on : ubuntu-latest
+  
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version : '6.0.x'
+          
+      - name: Restore
+        run: dotnet restore ./WT.WebFlexFramework/WT.WebFlexFramework.sln
+        
+      - name: Build
+        run: dotnet build ./WT.AsyncProductAPI/WT.AsyncProductAPI.sln  --configuration Release --no-restore
+        
+      - name: Publish
+        run : dotnet publish ./WT.AsyncProductAPI/WT.AsyncProductAPI.sln  --configuration Release --no-build 
+        
+      
