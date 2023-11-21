@@ -5,11 +5,6 @@ on:
   push:
     branches : 
     - master
-    
-env:
-  AZURE_WEBAPP_NAME : Async-API
-  AZUR_WEBAPP_PACKAGE_PATH: '/home/runner/work/WT.AsyncAPI/WT.AsyncAPI/WT.AsyncProductAPI/bin/Release/net6.0/publish/' 
-
 
 jobs:
   publish : 
@@ -27,9 +22,9 @@ jobs:
         run: dotnet restore ./WT.WebFlexFramework/WT.WebFlexFramework.sln
         
       - name: Build
-        run: dotnet build ./WT.AsyncProductAPI/WT.AsyncProductAPI.sln  --configuration Release --no-restore
+        run: dotnet build ./WT.WebFlexFramework/WT.WebFlexFramework.sln  --configuration Release --no-restore
         
       - name: Publish
-        run : dotnet publish ./WT.AsyncProductAPI/WT.AsyncProductAPI.sln  --configuration Release --no-build 
+        run : dotnet publish ./WT.WebFlexFramework/WT.WebFlexFramework.sln  --configuration Release --no-build 
         
       
