@@ -10,6 +10,7 @@ env:
   AZURE_WEBAPP_NAME : general-webapp
   AZUR_WEBAPP_PACKAGE_PATH: '/home/runner/work/WT.WebFlexFramework/WT.WebFlexFramework/WT.WebApplication/bin/Release/net6.0/publish/' 
 
+
 jobs:
   publish : 
     runs-on : ubuntu-latest
